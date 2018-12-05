@@ -13,6 +13,7 @@ SOLR_HOSTNAME = 'localhost'
 SOLR_PORT = '8983'
 ROWS_COUNT = '100'
 SOLR_ENDPOINT = SOLR_HOSTNAME+':'+SOLR_PORT
+CORE_NAME = 'IRF18P1'
 
 
 form_url = lambda c,q: 'http://'+SOLR_ENDPOINT+'/solr/'+c+'/select?q='+q+'&wt=json&indent=true&rows='+ROWS_COUNT
@@ -23,52 +24,43 @@ class Search_Query(Resource):
 	"""
 	def process_results(self, results):
 		'''
-		As of now, getting results obtained from Solr, writing them to a file, and performing tweet_analysis on it.
-		Return results.
-		TODO: Other functionalities
+		Getting results obtained from Solr, writing them to a file, and performing tweet_analysis on it. Return processed results.
 		'''
-
-		print('--------------------------------------------------------------')		
-		
+		num_res = {}
+		num_res["result_count"] = results["response"]["numFound"]
 		with open(JSON_FILENAME, "w") as write_file:
 			json.dump(results, write_file)
-
+		
 		anal = tweet_analysis.tweet_anal(JSON_FILENAME)
 		countries = anal.get_country_distro()
-		print('Country distribution of tweets:',countries)
-
-		print('--------------------------------------------------------------')
-
+		languages = anal.get_lang_distro()
+		sentiments = anal.sentiment_analysis()
+		tweets = anal.strip_tweets()
+		
+		res = [num_res, countries,languages,sentiments,tweets]
+		json_ret = json.dumps(res)
+		print(json_ret)
+		return json_ret
 
 	def get_from_solr(self,core,query):
 		'''
 		Method to get data from given Solr core, call method process_results() on it, get country distribution
-		TODO: Other functionalities
 		'''
-
-		core = 'IRF18P1'
-		# core = 'p3'+core+'core'
 		core_url = form_url(core, query)
 		solr_results = json.loads(urllib.request.urlopen(core_url).read())
-		countries = self.process_results(solr_results)
-		'''
-		TODO: Return countries distribution
-		'''
-		return solr_results
+		processed_results = self.process_results(solr_results)
+		return processed_results
 
 	def get(self, query):
 		'''
 		Endpoint for GET requests
 		input: search query
-		ret1,2,3 get results from the 3 different cores - vsm, bm25 and dfr
-		TODO: Process these results to return top 20 common tweets from the 3 sets of results.
+		Calls get_from_solr() which fetches results from Solr and calls process_results() to process and return results
+		Return these results to the frontend API call
 		'''
-
-		ret1 = self.get_from_solr('vsm',query)
-		# ret2 = self.get_from_solr('bm25',query)
-		# ret3 = self.get_from_solr('dfr',query)
-		if ret1:
-			return ret1, 200
+		ret = self.get_from_solr(CORE_NAME,query)
+		if ret:
+			return ret, 200
 		else:
 			return '', 404
 
