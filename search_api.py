@@ -11,11 +11,11 @@ api = Api(app)
 
 # declaring constants
 JSON_FILENAME = "data_file.json"
-SOLR_HOSTNAME = 'localhost'
+SOLR_HOSTNAME = 'ec2-18-224-141-235.us-east-2.compute.amazonaws.com'
 SOLR_PORT = '8983'
 ROWS_COUNT = '100'
 SOLR_ENDPOINT = SOLR_HOSTNAME+':'+SOLR_PORT
-CORE_NAME = 'IRF18P1'
+CORE_NAME = 'irp4'
 
 
 form_url = lambda c,q: 'http://'+SOLR_ENDPOINT+'/solr/'+c+'/select?q='+q+'&wt=json&indent=true&rows='+ROWS_COUNT

@@ -32,6 +32,9 @@ class tweet_anal:
             else:
                 # making usa the default country for all uncaught cities
                 countries['usa']+=counts[c]
+        
+        # The following lines in this method and the corresponding last 3 lines in the get_lang_distro(), strip_tweets() 
+        # and sentiment_analysis() methods were added to facilitate JSONifying the final object to be returned to the front end.
         countries_res = {}
         countries_res["countries"] = countries
         return countries_res
