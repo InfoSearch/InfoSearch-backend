@@ -32,22 +32,23 @@ class tweet_anal:
             else:
                 # making usa the default country for all uncaught cities
                 countries['usa']+=counts[c]
-        
-        # The following lines in this method and the corresponding last 3 lines in the get_lang_distro(), strip_tweets() 
-        # and sentiment_analysis() methods were added to facilitate JSONifying the final object to be returned to the front end.
         countries_res = {}
         countries_res["countries"] = countries
         return countries_res
     
     def get_lang_distro(self):
+        li = []
+        for d in self.df['tweet_lang']:
+            li.append(d[0])
+        self.df['language_s'] = li
         langs = dict(Counter(self.df['language_s']))
         langs_res = {}
         langs_res["languages"] = langs
         return langs_res
     
     def strip_tweets(self):
-        drop_range=np.r_[1:57,59:66,68:75,85:129]
-        self.df = self.df.drop(self.df.columns[drop_range], axis=1)
+#         drop_range=np.r_[1:57,59:66,68:75,85:129]
+#         self.df = self.df.drop(self.df.columns[drop_range], axis=1)
         tweets = self.df.to_json(orient='index')
         tweets_res = {}
         tweets_res["tweets"] = tweets
@@ -60,7 +61,7 @@ class tweet_anal:
             scores.append(self.sentiment_analyzer_scores(t))
         scores_res = {}
         scores_res["sentiments"] = scores
-        return scores_res
+        return scores_res      
         
     def sentiment_analyzer_scores(self,sentence):
         score = self.analyser.polarity_scores(sentence)
