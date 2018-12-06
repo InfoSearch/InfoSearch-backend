@@ -19,6 +19,7 @@ class tweet_anal:
         self.df = json_normalize(self.df['response']['docs'])
         self.df = self.df.drop(self.df.columns[0],axis=1)
         self.analyser = SentimentIntensityAnalyzer()
+        self.df = self.df.replace(np.nan, '', regex=True)
     
     def get_country_distro(self):
         '''
@@ -33,11 +34,7 @@ class tweet_anal:
                 # making usa the default country for all uncaught cities
                 countries['usa']+=counts[c]
 
-        # The following lines in this method and the corresponding last 3 lines in the get_lang_distro(), strip_tweets() 
-        # and sentiment_analysis() methods were added to facilitate JSONifying the final object to be returned to the front end.        
-        countries_res = {}
-        countries_res["countries"] = countries
-        return countries_res
+        return countries
     
     def get_lang_distro(self):
         li = []
@@ -45,26 +42,18 @@ class tweet_anal:
             li.append(d[0])
         self.df['language_s'] = li
         langs = dict(Counter(self.df['language_s']))
-        langs_res = {}
-        langs_res["languages"] = langs
-        return langs_res
+        return langs
     
     def strip_tweets(self):
-#         drop_range=np.r_[1:57,59:66,68:75,85:129]
-#         self.df = self.df.drop(self.df.columns[drop_range], axis=1)
-        tweets = self.df.to_json(orient='index')
-        tweets_res = {}
-        tweets_res["tweets"] = tweets
-        return tweets_res
+        tweets = self.df.to_dict(orient='records')
+        return tweets
     
     def sentiment_analysis(self):
         tweets = [d for d in self.df['text_en'] if d == d]
         scores = []
         for t in tweets:
             scores.append(self.sentiment_analyzer_scores(t))
-        scores_res = {}
-        scores_res["sentiments"] = scores
-        return scores_res      
+        return scores      
         
     def sentiment_analyzer_scores(self,sentence):
         score = self.analyser.polarity_scores(sentence)

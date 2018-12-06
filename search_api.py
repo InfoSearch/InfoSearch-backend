@@ -28,8 +28,6 @@ class Search_Query(Resource):
 		'''
 		Getting results obtained from Solr, writing them to a file, and performing tweet_analysis on it. Return processed results.
 		'''
-		num_res = {}
-		num_res["result_count"] = results["response"]["numFound"]
 		with open(JSON_FILENAME, "w") as write_file:
 			json.dump(results, write_file)
 		
@@ -39,9 +37,13 @@ class Search_Query(Resource):
 		sentiments = anal.sentiment_analysis()
 		tweets = anal.strip_tweets()
 		
-		res = [num_res, countries,languages,sentiments,tweets]
-		json_ret = json.loads(json.dumps(res))
-		return json_ret
+		res = {}
+		res['result_count'] = results["response"]["numFound"]
+		res['countries'] = countries
+		res['languages'] = languages
+		res['sentiments'] = sentiments
+		res['tweets'] = tweets
+		return res
 
 	def get_from_solr(self,core,query):
 		'''
@@ -64,18 +66,6 @@ class Search_Query(Resource):
 			return ret, 200
 		else:
 			return '', 404
-
-	# def post(self, name):
-	# 	parser = reqparse.RequestParser()
-	# 	parser.add_argument("age")
-	# 	args = parser.parse_args()
-
-	# 	for user in users:
-	# 		if name == user["name"]:
-	# 			return "User with name {} already exists".format(name), 400
-	# 	user = {"name":name,"age":args["age"]}
-	# 	users.append(user)
-	# 	return user, 201
 
 api.add_resource(Search_Query, "/query/<string:query>")
 app.run(host='0.0.0.0',debug=True)
