@@ -40,8 +40,7 @@ class Search_Query(Resource):
 		tweets = anal.strip_tweets()
 		
 		res = [num_res, countries,languages,sentiments,tweets]
-		json_ret = json.dumps(res)
-		print(json_ret)
+		json_ret = json.loads(json.dumps(res))
 		return json_ret
 
 	def get_from_solr(self,core,query):
@@ -79,4 +78,4 @@ class Search_Query(Resource):
 	# 	return user, 201
 
 api.add_resource(Search_Query, "/query/<string:query>")
-app.run(debug=True)
+app.run(host='0.0.0.0',debug=True)
