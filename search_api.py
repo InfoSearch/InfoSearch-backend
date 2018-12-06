@@ -13,18 +13,17 @@ api = Api(app)
 JSON_FILENAME = "data_file.json"
 SOLR_HOSTNAME = 'ec2-18-224-141-235.us-east-2.compute.amazonaws.com'
 SOLR_PORT = '8983'
-ROWS_COUNT = '100'
 SOLR_ENDPOINT = SOLR_HOSTNAME+':'+SOLR_PORT
 CORE_NAME = 'irp4'
 
 
-form_url = lambda c,q: 'http://'+SOLR_ENDPOINT+'/solr/'+c+'/select?q='+q+'&wt=json&indent=true&rows='+ROWS_COUNT
+form_url = lambda c,q,rows: 'http://'+SOLR_ENDPOINT+'/solr/'+c+'/select?q='+q+'&wt=json&indent=true&rows='+rows
 
 class Search_Query(Resource):
 	"""
 	class Search_Query: has methods to get search query from front end, return results
 	"""
-	def process_results(self, results):
+	def process_results(self, results, countries_results):
 		'''
 		Getting results obtained from Solr, writing them to a file, and performing tweet_analysis on it. Return processed results.
 		'''
@@ -32,7 +31,7 @@ class Search_Query(Resource):
 			json.dump(results, write_file)
 		
 		anal = tweet_analysis.tweet_anal(JSON_FILENAME)
-		countries = anal.get_country_distro()
+		countries = anal.get_country_distro(countries_results)
 		languages = anal.get_lang_distro()
 		sentiments = anal.sentiment_analysis()
 		tweets = anal.strip_tweets()
@@ -49,9 +48,13 @@ class Search_Query(Resource):
 		'''
 		Method to get data from given Solr core, call method process_results() on it, get country distribution
 		'''
-		core_url = form_url(core, query)
+		rows = '100'
+		core_url = form_url(core, query, rows)
+		rows = '100000'
+		countries_url = form_url(core, query, rows)+'&fl=city'
 		solr_results = json.loads(urllib.request.urlopen(core_url).read())
-		processed_results = self.process_results(solr_results)
+		countries_results = json.loads(urllib.request.urlopen(countries_url).read())
+		processed_results = self.process_results(solr_results,countries_results)
 		return processed_results
 
 	def get(self, query):

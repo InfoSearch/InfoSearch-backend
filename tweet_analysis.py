@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import json
 from collections import Counter
 from pandas.io.json import json_normalize
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -21,11 +22,14 @@ class tweet_anal:
         self.analyser = SentimentIntensityAnalyzer()
         self.df = self.df.replace(np.nan, '', regex=True)
     
-    def get_country_distro(self):
+    def get_country_distro(self,countries_results):
         '''
         Extracting country distribution from tweets for displaying heatmap
         ''' 
-        counts =  dict(Counter([i[0] for i in self.df['city'].replace(np.nan, '', regex=True) if i]))
+        json_countries = json.loads(json.dumps(countries_results))
+        countries_df = json_normalize(json_countries['response']['docs'])
+        counts = dict(Counter([i[0] for i in countries_df['city'].replace(np.nan, '', regex=True) if i]))
+
         countries = {}
         for c in counts:
             if c in self.cities_countries:
