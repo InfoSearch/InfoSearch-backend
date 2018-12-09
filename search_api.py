@@ -54,7 +54,7 @@ class Search_Query(Resource):
 		countries_url = form_url(core, query, rows)+'&fl=city'
 		solr_results = json.loads(urllib.request.urlopen(core_url).read().decode('utf-8'))
 		print('------------------------------------------------------')
-		print(solr_results)
+# 		print(solr_results)
 		print('------------------------------------------------------')
 		if solr_results['response']['numFound'] == 0:
 			return 'None found', 200
