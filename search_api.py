@@ -29,13 +29,13 @@ class Search_Query(Resource):
 		'''
 		with open(JSON_FILENAME, "w") as write_file:
 			json.dump(results, write_file)
-		
+
 		anal = tweet_analysis.tweet_anal(JSON_FILENAME)
 		countries = anal.get_country_distro(countries_results)
 		languages = anal.get_lang_distro()
 		sentiments = anal.sentiment_analysis()
 		tweets = anal.strip_tweets()
-		
+
 		res = {}
 		res['result_count'] = results["response"]["numFound"]
 		res['countries'] = countries
@@ -52,10 +52,10 @@ class Search_Query(Resource):
 		core_url = form_url(core, query, rows)
 		rows = '100000'
 		countries_url = form_url(core, query, rows)+'&fl=city'
-		solr_results = json.loads(urllib.request.urlopen(core_url).read())
+		solr_results = json.loads(urllib.request.urlopen(core_url).read()).decode('utf-8'))
 		if solr_results['response']['numFound'] == 0:
 			return ''
-		countries_results = json.loads(urllib.request.urlopen(countries_url).read())
+		countries_results = json.loads(urllib.request.urlopen(countries_url).read()).decode('utf-8'))
 		processed_results = self.process_results(solr_results,countries_results)
 		return processed_results
 
