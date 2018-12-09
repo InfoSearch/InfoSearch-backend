@@ -53,11 +53,8 @@ class Search_Query(Resource):
 		rows = '100000'
 		countries_url = form_url(core, query, rows)+'&fl=city'
 		solr_results = json.loads(urllib.request.urlopen(core_url).read())
-		print('------------------------------------------------------')
-		print(solr_results)
-		print('------------------------------------------------------')
 		if solr_results['response']['numFound'] == 0:
-			return 'None found', 200
+			return ''
 		countries_results = json.loads(urllib.request.urlopen(countries_url).read())
 		processed_results = self.process_results(solr_results,countries_results)
 		return processed_results

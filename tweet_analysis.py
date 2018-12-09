@@ -18,7 +18,7 @@ class tweet_anal:
         '''
         self.df = pd.read_json(filename)
         self.df = json_normalize(self.df['response']['docs'])
-        # self.df = self.df.drop(self.df.columns[0],axis=1)
+        self.df = self.df.drop(self.df.columns[0],axis=1)
         self.analyser = SentimentIntensityAnalyzer()
         self.df = self.df.replace(np.nan, '', regex=True)
     
