@@ -21,6 +21,7 @@ class tweet_anal:
         self.df = self.df.drop(self.df.columns[0],axis=1)
         self.analyser = SentimentIntensityAnalyzer()
         self.df = self.df.replace(np.nan, '', regex=True)
+        self.df['tweet_id'] = [str(ti[0]) for ti in self.df['tweet_id']]        
     
     def get_country_distro(self,countries_results):
         '''
