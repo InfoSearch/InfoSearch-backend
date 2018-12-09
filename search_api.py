@@ -52,10 +52,10 @@ class Search_Query(Resource):
 		core_url = form_url(core, query, rows)
 		rows = '100000'
 		countries_url = form_url(core, query, rows)+'&fl=city'
-		solr_results = json.loads(urllib.request.urlopen(core_url).read()).decode('utf-8'))
+		solr_results = json.loads(urllib.request.urlopen(core_url).read().decode('utf-8'))
 		if solr_results['response']['numFound'] == 0:
 			return ''
-		countries_results = json.loads(urllib.request.urlopen(countries_url).read()).decode('utf-8'))
+		countries_results = json.loads(urllib.request.urlopen(countries_url).read().decode('utf-8'))
 		processed_results = self.process_results(solr_results,countries_results)
 		return processed_results
 
