@@ -14,10 +14,10 @@ JSON_FILENAME = "data_file.json"
 SOLR_HOSTNAME = 'ec2-18-224-141-235.us-east-2.compute.amazonaws.com'
 SOLR_PORT = '8983'
 SOLR_ENDPOINT = SOLR_HOSTNAME+':'+SOLR_PORT
-CORE_NAME = 'irp4'
+CORE_NAME = 'project_final'
 
 
-form_url = lambda c,q,rows: 'http://'+SOLR_ENDPOINT+'/solr/'+c+'/select?q='+q+'&wt=json&indent=true&rows='+rows
+form_url = lambda c,q,rows: 'http://'+SOLR_ENDPOINT+'/solr/'+c+'/select?q='+urllib.request.quote(q.replace(' ','+'), safe='')+'&wt=json&indent=true&rows='+rows
 
 class Search_Query(Resource):
 	"""
@@ -53,6 +53,11 @@ class Search_Query(Resource):
 		rows = '100000'
 		countries_url = form_url(core, query, rows)+'&fl=city'
 		solr_results = json.loads(urllib.request.urlopen(core_url).read())
+		print('------------------------------------------------------')
+		print(solr_results)
+		print('------------------------------------------------------')
+		if solr_results['response']['numFound'] == 0:
+			return 'None found', 200
 		countries_results = json.loads(urllib.request.urlopen(countries_url).read())
 		processed_results = self.process_results(solr_results,countries_results)
 		return processed_results
