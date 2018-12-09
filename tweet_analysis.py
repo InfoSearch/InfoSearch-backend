@@ -37,7 +37,10 @@ class tweet_anal:
                 countries[self.cities_countries[c]] = counts[c]
             else:
                 # making usa the default country for all uncaught cities
-                countries['usa']+=counts[c]
+                if ('usa' in countries):
+                    countries['usa'] = counts[c]
+                else:
+                    countries['usa'] = counts[c]
 
         return countries
     
