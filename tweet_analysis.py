@@ -60,7 +60,22 @@ class tweet_anal:
         scores = []
         for t in tweets:
             scores.append(self.sentiment_analyzer_scores(t))
-        return scores      
+        overall_sentiment = {}
+        overall_sentiment['pos'], overall_sentiment['neu'], overall_sentiment['neg'] =0, 0, 0
+        for s in scores:
+            pos, neu, neg = s['pos'], s['neu'], s['neg']
+            if(pos > neu and pos > neg):
+                overall_sentiment['pos'] += 1
+            elif (neg > pos and neg > neu):
+                overall_sentiment['neg'] += 1
+            elif (neu > neg and neu > pos):
+                overall_sentiment['neu'] += 1
+
+        sentiment_results  = {}
+        sentiment_results['overall_sentiment'] = overall_sentiment
+        sentiment_results['scores'] = scores
+
+        return sentiment_results
         
     def sentiment_analyzer_scores(self,sentence):
         score = self.analyser.polarity_scores(sentence)
