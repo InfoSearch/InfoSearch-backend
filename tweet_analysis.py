@@ -53,6 +53,8 @@ class tweet_anal:
         return tweets
     
     def sentiment_analysis(self):
+        if 'text_en' not in self.df.columns:
+            return []
         tweets = [d for d in self.df['text_en'] if d == d]
         scores = []
         for t in tweets:
